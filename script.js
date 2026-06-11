@@ -45,7 +45,7 @@ if (contactForm) {
             status.innerText = "Sending...";
 
             const response = await fetch(
-                "https://portfolio-backend-f06n.onrender.com",
+              "https://portfolio-backend-f06n.onrender.com/contact",
                 {
                     method: "POST",
                     headers: {
