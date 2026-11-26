@@ -1,3 +1,4 @@
+
 // Active Navigation Highlight
 const sections = document.querySelectorAll("section[id]");
 const navLinks = document.querySelectorAll(".nav-links a");
@@ -26,7 +27,8 @@ window.addEventListener("scroll", () => {
     });
 });
 
-// Contact Form
+
+// Contact Form - Formspree Integration
 const contactForm = document.getElementById("contactForm");
 
 if (contactForm) {
@@ -34,39 +36,46 @@ if (contactForm) {
         e.preventDefault();
 
         const status = document.getElementById("status");
+        const submitButton = contactForm.querySelector(
+            'button[type="submit"]'
+        );
 
-        const data = {
-            name: document.getElementById("name").value.trim(),
-            email: document.getElementById("email").value.trim(),
-            message: document.getElementById("message").value.trim()
-        };
+        const originalButtonText = submitButton.innerText;
+
+        status.innerText = "Sending...";
+        submitButton.disabled = true;
+        submitButton.innerText = "Sending...";
 
         try {
-            status.innerText = "Sending...";
-
             const response = await fetch(
-              "https://portfolio-backend-f06n.onrender.com/contact",
+                "https://formspree.io/f/mdegbjaw",
                 {
                     method: "POST",
+                    body: new FormData(contactForm),
                     headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data)
+                        "Accept": "application/json"
+                    }
                 }
             );
 
             const result = await response.json();
 
-            if (result.success) {
-                status.innerText = "✅ Message sent successfully!";
+            if (response.ok) {
+                status.innerText = "✅ Message sent successfully! Thank you for contacting me.";
                 contactForm.reset();
             } else {
-                status.innerText = result.message || "❌ Failed to send message.";
+                status.innerText =
+                    result.errors?.map(error => error.message).join(", ") ||
+                    "❌ Unable to send your message. Please try again.";
             }
 
         } catch (error) {
-            console.error(error);
-            status.innerText = "❌ Server connection failed.";
+            console.error("Formspree error:", error);
+            status.innerText =
+                "❌ Connection failed. Please check your internet and try again.";
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerText = originalButtonText;
         }
     });
 }
